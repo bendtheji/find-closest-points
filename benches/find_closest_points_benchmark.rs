@@ -1,6 +1,6 @@
-use std::cell::RefCell;
 use std::collections::BinaryHeap;
-use std::rc::Rc;
+use std::time::Duration;
+
 use criterion::{BatchSize, Bencher, black_box, Criterion, criterion_group, criterion_main};
 
 use find_closest_points::kd_tree::{Distance, find_k_nearest_neighbours, KdTreeNode};
@@ -12,8 +12,8 @@ fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
     let given_point = black_box(Point::random());
     b.iter_batched(|| (BinaryHeap::<Distance>::new(), tree.clone()),
                    |(mut heap, tree)| find_k_nearest_neighbours(Some(Box::new(tree)),
-                                                        &given_point,
-                                                        0, 3, &mut heap),
+                                                                &given_point,
+                                                                0, 3, &mut heap),
                    BatchSize::SmallInput);
     // b.iter_batched(|| (points.clone(), BinaryHeap::<Distance>::new()),
     //                |(points, mut nearest)| {
@@ -44,6 +44,7 @@ fn generate_10m_random_points() -> Vec<Point> {
 
 fn find_closest_points_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Find closest points");
+    group.measurement_time(Duration::new(40, 0));
     group.bench_function("Find 10 nearest neighbours using kd tree", bench_find_closest_neighbours_kd_tree);
 }
 

@@ -1,9 +1,5 @@
-use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
-use std::rc::Rc;
-
-use rand::{Rng, thread_rng};
 
 use crate::point::Point;
 
@@ -63,7 +59,7 @@ fn partition(mut points: Vec<Point>, curr_dimension: u8) -> (Point, Vec<Point>, 
     // let mut rng = thread_rng();
     // let index = rng.gen_range(0..points.len());
     // let pivot = points.swap_remove(index);
-    points.sort_by(|a,b| compare_dimension(a, b, curr_dimension));
+    points.sort_by(|a, b| compare_dimension(a, b, curr_dimension));
     let mid = points.len() / 2;
     let pivot = points.swap_remove(mid);
     let mut lesser = vec![];
@@ -116,7 +112,7 @@ impl Ord for Distance {
 }
 
 pub fn find_k_nearest_neighbours(curr_node: Option<Box<KdTreeNode>>, given_point: &Point, curr_dimension: u8, max_dimension: u8,
-                             k_nearest_neighbours: &mut BinaryHeap<Distance>) {
+                                 k_nearest_neighbours: &mut BinaryHeap<Distance>) {
     if let Some(x) = curr_node {
         let curr_node = *x;
         let curr_point = curr_node.point;
