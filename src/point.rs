@@ -24,9 +24,15 @@ impl Point {
     }
 
     pub fn distance_to(&self, other: &Point) -> f64 {
-        ((self.x - other.x).powf(2.0)
-            + (self.y - other.y).powf(2.0)
-            + (self.z - other.z).powf(2.0)).sqrt()
+        ((self.x - other.x).powi(2)
+            + (self.y - other.y).powi(2)
+            + (self.z - other.z).powi(2)).sqrt()
+    }
+
+    pub fn distance_sq(&self, other: &Point) -> f64 {
+        (self.x - other.x).powi(2)
+            + (self.y - other.y).powi(2)
+            + (self.z - other.z).powi(2)
     }
 
     pub fn get_dimension(&self, dimension: u8) -> f64 {

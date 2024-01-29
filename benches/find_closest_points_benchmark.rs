@@ -36,7 +36,7 @@ fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
 
 fn generate_10m_random_points() -> Vec<Point> {
     let mut points = vec![];
-    for i in 0..10000000 {
+    for i in 0..10_000_000 {
         points.push(Point::random());
     }
     points

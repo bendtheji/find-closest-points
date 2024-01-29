@@ -136,7 +136,34 @@ pub fn find_k_nearest_neighbours(curr_node: Option<Box<KdTreeNode>>, given_point
     if let Some(x) = curr_node {
         let curr_node = *x;
         let curr_point = curr_node.point;
-        let curr_distance = given_point.distance_to(&curr_point);
+
+        let curr_dimension = curr_dimension % max_dimension;
+        match compare_dimension(&curr_point, given_point, curr_dimension) {
+            // if current node current dimension is greater than given node, go into left subtree
+            Ordering::Greater => {
+                find_k_nearest_neighbours(curr_node.left, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
+                // check if we should be going into the other bounding box
+                let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs().powi(2);
+                if let Some(d) = k_nearest_neighbours.peek() {
+                    if distance_to_other_bounding_box <= d.value {
+                        find_k_nearest_neighbours(curr_node.right, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
+                    }
+                }
+            }
+            // if current node current dimension is equal or less than given node, go into right subtree
+            Ordering::Equal | Ordering::Less => {
+                find_k_nearest_neighbours(curr_node.right, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
+                // check if we should be going into the other bounding box
+                let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs().powi(2);
+                if let Some(d) = k_nearest_neighbours.peek() {
+                    if distance_to_other_bounding_box <= d.value {
+                        find_k_nearest_neighbours(curr_node.left, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
+                    }
+                }
+            }
+        }
+
+        let curr_distance = given_point.distance_sq(&curr_point);
 
         // two cases, one is binary heap has 10 points already
         // 1) there are less than ten points inside, so we just push
@@ -152,32 +179,6 @@ pub fn find_k_nearest_neighbours(curr_node: Option<Box<KdTreeNode>>, given_point
                     k_nearest_neighbours.push(Distance { value: curr_distance, other_point: curr_point.clone() });
                 }
                 _ => {}
-            }
-        }
-
-        let curr_dimension = curr_dimension % max_dimension;
-        match compare_dimension(&curr_point, given_point, curr_dimension) {
-            // if current node current dimension is greater than given node, go into left subtree
-            Ordering::Greater => {
-                find_k_nearest_neighbours(curr_node.left, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
-                // check if we should be going into the other bounding box
-                let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs();
-                if let Some(d) = k_nearest_neighbours.peek() {
-                    if distance_to_other_bounding_box <= d.value {
-                        find_k_nearest_neighbours(curr_node.right, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
-                    }
-                }
-            }
-            // if current node current dimension is equal or less than given node, go into right subtree
-            Ordering::Equal | Ordering::Less => {
-                find_k_nearest_neighbours(curr_node.right, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
-                // check if we should be going into the other bounding box
-                let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs();
-                if let Some(d) = k_nearest_neighbours.peek() {
-                    if distance_to_other_bounding_box <= d.value {
-                        find_k_nearest_neighbours(curr_node.left, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);
-                    }
-                }
             }
         }
     }

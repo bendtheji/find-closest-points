@@ -22,7 +22,7 @@ fn main() {
         println!("Distance, value: {:?}, point: {:?}", distance.value, distance.other_point);
     }
 
-    let mut distances = clone_points.into_iter().map(|p| Distance { value: given_point.distance_to(&p), other_point: p }).collect::<Vec<Distance>>();
+    let mut distances = clone_points.into_iter().map(|p| Distance { value: given_point.distance_sq(&p), other_point: p }).collect::<Vec<Distance>>();
     distances.sort();
     println!("using sort: ");
     for i in 0..10 {
