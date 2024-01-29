@@ -55,13 +55,29 @@ fn construct_kd_tree(mut points: Vec<Point>, max_dimensions: u8, curr_dimension:
 }
 
 fn partition(mut points: Vec<Point>, curr_dimension: u8) -> (Point, Vec<Point>, Vec<Point>) {
-    // pick a random point as pivot
+    // method 1: pick a random point as pivot
     // let mut rng = thread_rng();
     // let index = rng.gen_range(0..points.len());
     // let pivot = points.swap_remove(index);
-    points.sort_by(|a, b| compare_dimension(a, b, curr_dimension));
-    let mid = points.len() / 2;
-    let pivot = points.swap_remove(mid);
+
+    // method 2: sort in ascending order then take median
+    // points.sort_by(|a, b| compare_dimension(a, b, curr_dimension));
+    // let mid = points.len() / 2;
+    // let pivot = points.swap_remove(mid);
+
+    // method 3: find element closest to mean
+    let mean = calculate_mean(&points, curr_dimension);
+    let mut min_diff = f64::MAX;
+    let mut mean_index = 0;
+    for (i, point) in points.iter().enumerate() {
+        let curr_point_dimension = point.get_dimension(curr_dimension);
+        let diff = (curr_point_dimension - mean).abs();
+        if diff < min_diff {
+            min_diff = diff;
+            mean_index = i;
+        }
+    }
+    let pivot = points.swap_remove(mean_index);
     let mut lesser = vec![];
     let mut greater = vec![];
 
@@ -74,6 +90,10 @@ fn partition(mut points: Vec<Point>, curr_dimension: u8) -> (Point, Vec<Point>, 
         }
     }
     (pivot, lesser, greater)
+}
+
+fn calculate_mean(points: &Vec<Point>, curr_dimension: u8) -> f64 {
+    points.iter().map(|p| p.get_dimension(curr_dimension)).sum::<f64>() / points.len() as f64
 }
 
 fn compare_dimension(pivot: &Point, other_point: &Point, curr_dimension: u8) -> Ordering {

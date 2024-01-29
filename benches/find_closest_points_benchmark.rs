@@ -10,8 +10,8 @@ fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
     let points = black_box(generate_10m_random_points());
     let tree = black_box(KdTreeNode::construct_tree(points));
     let given_point = black_box(Point::random());
-    b.iter_batched(|| (BinaryHeap::<Distance>::new(), tree.clone()),
-                   |(mut heap, tree)| find_k_nearest_neighbours(Some(Box::new(tree)),
+    b.iter_batched(|| (BinaryHeap::<Distance>::new(), Some(Box::new(tree.clone()))),
+                   |(mut heap, tree)| find_k_nearest_neighbours(tree,
                                                                 &given_point,
                                                                 0, 3, &mut heap),
                    BatchSize::SmallInput);
@@ -36,7 +36,7 @@ fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
 
 fn generate_10m_random_points() -> Vec<Point> {
     let mut points = vec![];
-    for i in 0..10_000_000 {
+    for i in 0..10000000 {
         points.push(Point::random());
     }
     points

@@ -9,10 +9,13 @@ fn main() {
         points.push(Point::random());
     }
     let mut clone_points: Vec<Point> = points.clone();
+    println!("constructing tree...");
     let tree = KdTreeNode::construct_tree(points);
+    println!("construction finished");
 
     let given_point = Point::random();
     let mut heap = BinaryHeap::new();
+    println!("finding nearest neighbours");
     find_k_nearest_neighbours(Some(Box::new(tree)), &given_point, 0, 3, &mut heap);
     println!("given point: {:?}", given_point);
     for distance in &heap {
