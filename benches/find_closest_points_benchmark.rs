@@ -8,12 +8,12 @@ use find_closest_points::point::Point;
 
 fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
     let points = black_box(generate_10m_random_points());
-    let tree = black_box(KdTreeNode::construct_tree(points));
+    let tree = black_box(Some(Box::new(KdTreeNode::construct_tree(points))));
     let given_point = black_box(Point::random());
-    b.iter_batched(|| (BinaryHeap::<Distance>::new(), Some(Box::new(tree.clone()))),
-                   |(mut heap, tree)| find_k_nearest_neighbours(tree,
-                                                                &given_point,
-                                                                0, 3, &mut heap),
+    b.iter_batched(|| BinaryHeap::<Distance>::new(),
+                   |mut heap| find_k_nearest_neighbours(&tree,
+                                                        &given_point,
+                                                        0, 3, &mut heap),
                    BatchSize::SmallInput);
     // b.iter_batched(|| (points.clone(), BinaryHeap::<Distance>::new()),
     //                |(points, mut nearest)| {
@@ -44,7 +44,7 @@ fn generate_10m_random_points() -> Vec<Point> {
 
 fn find_closest_points_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Find closest points");
-    group.measurement_time(Duration::new(40, 0));
+    // group.measurement_time(Duration::new(40, 0));
     group.bench_function("Find 10 nearest neighbours using kd tree", bench_find_closest_neighbours_kd_tree);
 }
 

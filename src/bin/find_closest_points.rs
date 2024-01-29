@@ -16,7 +16,7 @@ fn main() {
     let given_point = Point::random();
     let mut heap = BinaryHeap::new();
     println!("finding nearest neighbours");
-    find_k_nearest_neighbours(Some(Box::new(tree)), &given_point, 0, 3, &mut heap);
+    find_k_nearest_neighbours(&Some(Box::new(tree)), &given_point, 0, 3, &mut heap);
     println!("given point: {:?}", given_point);
     for distance in &heap {
         println!("Distance, value: {:?}, point: {:?}", distance.value, distance.other_point);
