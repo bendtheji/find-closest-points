@@ -1,7 +1,5 @@
 use std::cmp::Ordering;
 
-use rand::Rng;
-
 use crate::point::{Dimension, Point};
 
 #[derive(Debug, Clone)]
@@ -55,18 +53,7 @@ fn construct_kd_tree(mut points: Vec<Point>, curr_dimension: &Dimension) -> Opti
 }
 
 fn partition(mut points: Vec<Point>, curr_dimension: &Dimension) -> (Point, Vec<Point>, Vec<Point>) {
-    let mean = calculate_mean(&points, curr_dimension);
-    let mut min_diff = f64::MAX;
-    let mut mean_index = 0;
-    for (i, point) in points.iter().enumerate() {
-        let curr_point_dimension = point.get_dimension(curr_dimension);
-        let diff = (curr_point_dimension - mean).abs();
-        if diff < min_diff {
-            min_diff = diff;
-            mean_index = i;
-        }
-    }
-    let pivot = points.swap_remove(mean_index);
+    let pivot = get_pivot(&mut points, curr_dimension);
 
     let mut lesser = vec![];
     let mut greater = vec![];
@@ -106,7 +93,7 @@ fn calculate_mean(points: &Vec<Point>, curr_dimension: &Dimension) -> f64 {
 mod kd_tree_test {
     use crate::point::{Dimension, Point};
 
-    use super::calculate_mean;
+    use super::{calculate_mean, get_pivot};
 
     #[test]
     fn get_x_mean_from_points() {
@@ -149,6 +136,53 @@ mod kd_tree_test {
         let points = vec![];
         let output = calculate_mean(&points, &Dimension::X);
         let expected = 0.0;
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn get_pivot_along_x_axis() {
+        let mut points = vec![
+            Point::new(0.1, 0.2, 0.3),
+            Point::new(0.2, 0.3, 0.1),
+            Point::new(0.3, 0.1, 0.2),
+        ];
+        let output = get_pivot(&mut points, &Dimension::X);
+        let expected = Point::new(0.2, 0.3, 0.1);
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn get_pivot_along_y_axis() {
+        let mut points = vec![
+            Point::new(0.1, 0.2, 0.3),
+            Point::new(0.2, 0.3, 0.1),
+            Point::new(0.3, 0.1, 0.2),
+        ];
+        let output = get_pivot(&mut points, &Dimension::Y);
+        let expected = Point::new(0.1, 0.2, 0.3);
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn get_pivot_along_z_axis() {
+        let mut points = vec![
+            Point::new(0.1, 0.2, 0.3),
+            Point::new(0.2, 0.3, 0.1),
+            Point::new(0.3, 0.1, 0.2),
+        ];
+        let output = get_pivot(&mut points, &Dimension::Z);
+        let expected = Point::new(0.3, 0.1, 0.2);
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn get_pivot_between_same_values() {
+        let mut points = vec![
+            Point::new(0.1, 0.2, 0.3),
+            Point::new(0.1, 0.3, 0.2),
+        ];
+        let output = get_pivot(&mut points, &Dimension::X);
+        let expected = Point::new(0.1, 0.2, 0.3);
         assert_eq!(output, expected);
     }
 }
