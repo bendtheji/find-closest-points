@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::point::Point;
+use crate::point::{Dimension, Point};
 
 #[derive(Debug, Clone)]
 pub struct KdTreeNode {
@@ -19,14 +19,14 @@ impl KdTreeNode {
     }
 
     pub fn construct_tree(points: Vec<Point>) -> KdTreeNode {
-        match construct_kd_tree(points, 3, 0) {
+        match construct_kd_tree(points, &Dimension::X) {
             Some(x) => *x,
             None => KdTreeNode { point: Default::default(), left: None, right: None }
         }
     }
 }
 
-fn construct_kd_tree(mut points: Vec<Point>, max_dimensions: u8, curr_dimension: u8) -> Option<Box<KdTreeNode>> {
+fn construct_kd_tree(mut points: Vec<Point>, curr_dimension: &Dimension) -> Option<Box<KdTreeNode>> {
     // base cases
     // remaining points is 1 or 0 length
     match points.len() {
@@ -39,21 +39,20 @@ fn construct_kd_tree(mut points: Vec<Point>, max_dimensions: u8, curr_dimension:
             Some(Box::new(node))
         }
         _ => {
-            let curr_dimension = curr_dimension % max_dimensions;
             // got two or more elements, we need to
             // 1) find a random middle element as a pivot
             // 2) partition the two vectors into points less than current dimension
             // and points more than current dimension
             let (pivot, lesser, greater) = partition(points, curr_dimension);
             let mut pivot = KdTreeNode::new(pivot);
-            pivot.left = construct_kd_tree(lesser, 3, curr_dimension + 1);
-            pivot.right = construct_kd_tree(greater, 3, curr_dimension + 1);
+            pivot.left = construct_kd_tree(lesser, &curr_dimension.turn());
+            pivot.right = construct_kd_tree(greater, &curr_dimension.turn());
             Some(Box::new(pivot))
         }
     }
 }
 
-fn partition(mut points: Vec<Point>, curr_dimension: u8) -> (Point, Vec<Point>, Vec<Point>) {
+fn partition(mut points: Vec<Point>, curr_dimension: &Dimension) -> (Point, Vec<Point>, Vec<Point>) {
     // method 1: pick a random point as pivot
     // let mut rng = thread_rng();
     // let index = rng.gen_range(0..points.len());
@@ -91,15 +90,6 @@ fn partition(mut points: Vec<Point>, curr_dimension: u8) -> (Point, Vec<Point>, 
     (pivot, lesser, greater)
 }
 
-fn calculate_mean(points: &Vec<Point>, curr_dimension: u8) -> f64 {
+fn calculate_mean(points: &Vec<Point>, curr_dimension: &Dimension) -> f64 {
     points.iter().map(|p| p.get_dimension(curr_dimension)).sum::<f64>() / points.len() as f64
-}
-
-pub fn compare_dimension(pivot: &Point, other_point: &Point, curr_dimension: u8) -> Ordering {
-    match curr_dimension {
-        0 => pivot.x.total_cmp(&other_point.x),
-        1 => pivot.y.total_cmp(&other_point.y),
-        2 => pivot.z.total_cmp(&other_point.z),
-        _ => unreachable!()
-    }
 }

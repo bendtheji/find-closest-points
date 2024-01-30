@@ -5,7 +5,7 @@ use criterion::{BatchSize, Bencher, black_box, Criterion, criterion_group, crite
 
 use find_closest_points::kd_tree::KdTreeNode;
 use find_closest_points::nearest_neighbour::{Distance, find_k_nearest_neighbours};
-use find_closest_points::point::Point;
+use find_closest_points::point::{Dimension, Point};
 
 fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
     let points = black_box(generate_10m_random_points());
@@ -14,7 +14,7 @@ fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
     b.iter_batched(|| BinaryHeap::<Distance>::new(),
                    |mut heap| find_k_nearest_neighbours(&tree,
                                                         &given_point,
-                                                        0, 3, &mut heap),
+                                                        &Dimension::X, &mut heap),
                    BatchSize::SmallInput);
     // b.iter_batched(|| (points.clone(), BinaryHeap::<Distance>::new()),
     //                |(points, mut nearest)| {

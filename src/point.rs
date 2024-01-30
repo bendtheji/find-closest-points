@@ -35,21 +35,19 @@ impl Point {
             + (self.z - other.z).powi(2)
     }
 
-    pub fn get_dimension(&self, dimension: u8) -> f64 {
+    pub fn get_dimension(&self, dimension: &Dimension) -> f64 {
         match dimension {
-            0 => self.x,
-            1 => self.y,
-            2 => self.z,
-            _ => unreachable!()
+            Dimension::X => self.x,
+            Dimension::Y => self.y,
+            Dimension::Z => self.z,
         }
     }
 
-    pub fn compare_dimension(&self, other: &Point, dimension: u8) -> Ordering {
+    pub fn compare_dimension(&self, other: &Point, dimension: &Dimension) -> Ordering {
         match dimension {
-            0 => self.x.total_cmp(&other.x),
-            1 => self.y.total_cmp(&other.y),
-            2 => self.z.total_cmp(&other.z),
-            _ => unreachable!()
+            Dimension::X => self.x.total_cmp(&other.x),
+            Dimension::Y => self.y.total_cmp(&other.y),
+            Dimension::Z => self.z.total_cmp(&other.z),
         }
     }
 }
