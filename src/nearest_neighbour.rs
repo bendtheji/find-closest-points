@@ -41,9 +41,13 @@ pub fn find_k_nearest_neighbours(curr_node: &Option<Box<KdTreeNode>>, given_poin
                 find_k_nearest_neighbours(&curr_node.as_ref().right, given_point, &curr_dimension.turn(), k_nearest_neighbours);
                 // check if we should be going into the other bounding box
                 let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs();
-                if let Some(d) = k_nearest_neighbours.peek() {
-                    if distance_to_other_bounding_box <= d.value {
-                        find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+                if k_nearest_neighbours.len() < 10 {
+                    find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+                } else {
+                    if let Some(d) = k_nearest_neighbours.peek() {
+                        if distance_to_other_bounding_box < d.value {
+                            find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+                        }
                     }
                 }
             }
@@ -51,9 +55,13 @@ pub fn find_k_nearest_neighbours(curr_node: &Option<Box<KdTreeNode>>, given_poin
                 find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, &curr_dimension.turn(), k_nearest_neighbours);
                 // check if we should be going into the other bounding box
                 let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs();
-                if let Some(d) = k_nearest_neighbours.peek() {
-                    if distance_to_other_bounding_box <= d.value {
-                        find_k_nearest_neighbours(&curr_node.as_ref().right, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+                if k_nearest_neighbours.len() < 10 {
+                    find_k_nearest_neighbours(&curr_node.as_ref().right, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+                } else {
+                    if let Some(d) = k_nearest_neighbours.peek() {
+                        if distance_to_other_bounding_box < d.value {
+                            find_k_nearest_neighbours(&curr_node.as_ref().right, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+                        }
                     }
                 }
             }
@@ -69,12 +77,11 @@ pub fn find_k_nearest_neighbours(curr_node: &Option<Box<KdTreeNode>>, given_poin
         // 2) we need to check against the top, if curr node distance is shorter
         // we pop the top and push this new one in
         else {
-            match k_nearest_neighbours.peek() {
-                Some(x) if x.value > curr_distance => {
+            if let Some(d) = k_nearest_neighbours.peek() {
+                if curr_distance < d.value {
                     k_nearest_neighbours.pop();
                     k_nearest_neighbours.push(Distance { value: curr_distance, other_point: curr_point.clone() });
                 }
-                _ => {}
             }
         }
     }

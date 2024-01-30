@@ -7,7 +7,7 @@ use find_closest_points::nearest_neighbour::{Distance, find_k_nearest_neighbours
 fn main() {
     println!("generating random points");
     let mut points = vec![];
-    for _ in 0..30 {
+    for _ in 0..10_000_000 {
         points.push(Point::random());
     }
 
