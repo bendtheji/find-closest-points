@@ -10,7 +10,7 @@ pub struct Point {
 }
 
 impl Point {
-    fn new(x: f64, y: f64, z: f64) -> Point {
+    pub fn new(x: f64, y: f64, z: f64) -> Point {
         Point {
             x: clamp(x),
             y: clamp(y),
@@ -43,7 +43,7 @@ impl Point {
 }
 
 fn clamp(coordinate: f64) -> f64 {
-    coordinate.max(0.0).min(1.0)
+    coordinate.clamp(0.0, 1.0)
 }
 
 #[cfg(test)]
