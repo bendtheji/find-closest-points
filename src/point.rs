@@ -57,3 +57,41 @@ impl Point {
 fn clamp(coordinate: f64) -> f64 {
     coordinate.max(0.0).min(1.0)
 }
+
+#[derive(Debug, PartialEq)]
+pub enum Dimension {
+    X,
+    Y,
+    Z,
+}
+
+impl Dimension {
+    pub fn turn(&self) -> Self {
+        use Dimension::*;
+        match self {
+            X => Y,
+            Y => Z,
+            Z => X
+        }
+    }
+}
+
+#[cfg(test)]
+mod dimension_test{
+    use super::Dimension;
+
+    #[test]
+    fn turn_x() {
+        assert_eq!(Dimension::X.turn(), Dimension::Y);
+    }
+
+    #[test]
+    fn turn_y() {
+        assert_eq!(Dimension::Y.turn(), Dimension::Z);
+    }
+
+    #[test]
+    fn turn_z() {
+        assert_eq!(Dimension::Z.turn(), Dimension::X);
+    }
+}
