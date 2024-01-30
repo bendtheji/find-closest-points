@@ -16,23 +16,6 @@ fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
                                                         &given_point,
                                                         &Dimension::X, &mut heap),
                    BatchSize::SmallInput);
-    // b.iter_batched(|| (points.clone(), BinaryHeap::<Distance>::new()),
-    //                |(points, mut nearest)| {
-    //                    let mut distances = points.into_iter().map(|p| Distance { value: given_point.distance_to(&p), other_point: p }).collect::<Vec<Distance>>();
-    //                    for distance in distances {
-    //                         if nearest.len() < 10 {
-    //                             nearest.push(distance)
-    //                         } else {
-    //                             match nearest.peek() {
-    //                                 Some(x) if x.value > distance.value => {
-    //                                     nearest.pop();
-    //                                     nearest.push(distance)
-    //                                 },
-    //                                 _ => {}
-    //                             }
-    //                         }
-    //                    }
-    //                }, BatchSize::SmallInput);
 }
 
 fn generate_10m_random_points() -> Vec<Point> {
