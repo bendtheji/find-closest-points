@@ -3,7 +3,8 @@ use std::time::Duration;
 
 use criterion::{BatchSize, Bencher, black_box, Criterion, criterion_group, criterion_main};
 
-use find_closest_points::kd_tree::{Distance, find_k_nearest_neighbours, KdTreeNode};
+use find_closest_points::kd_tree::KdTreeNode;
+use find_closest_points::nearest_neighbour::{Distance, find_k_nearest_neighbours};
 use find_closest_points::point::Point;
 
 fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
