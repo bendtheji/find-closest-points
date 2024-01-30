@@ -5,6 +5,7 @@ use find_closest_points::point::{Dimension, Point};
 use find_closest_points::nearest_neighbour::{Distance, find_k_nearest_neighbours};
 
 fn main() {
+    println!("generating random points");
     let mut points = vec![];
     for _ in 0..30 {
         points.push(Point::random());
