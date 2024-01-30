@@ -43,10 +43,10 @@ fn construct_kd_tree(mut points: Vec<Point>, curr_dimension: &Dimension) -> Opti
             // 1) find a random middle element as a pivot
             // 2) partition the two vectors into points less than current dimension
             // and points more than current dimension
-            let (pivot, lesser, greater) = partition(points, curr_dimension);
+            let (pivot, left_sub_tree, right_sub_tree) = partition(points, curr_dimension);
             let mut pivot = KdTreeNode::new(pivot);
-            pivot.left = construct_kd_tree(lesser, &curr_dimension.turn());
-            pivot.right = construct_kd_tree(greater, &curr_dimension.turn());
+            pivot.left = construct_kd_tree(left_sub_tree, &curr_dimension.turn());
+            pivot.right = construct_kd_tree(right_sub_tree, &curr_dimension.turn());
             Some(Box::new(pivot))
         }
     }
@@ -55,18 +55,16 @@ fn construct_kd_tree(mut points: Vec<Point>, curr_dimension: &Dimension) -> Opti
 fn partition(mut points: Vec<Point>, curr_dimension: &Dimension) -> (Point, Vec<Point>, Vec<Point>) {
     let pivot = get_pivot(&mut points, curr_dimension);
 
-    let mut lesser = vec![];
-    let mut greater = vec![];
+    let mut left_sub_tree = vec![];
+    let mut right_sub_tree = vec![];
 
     for point in points {
-        match pivot.compare_dimension(&point, curr_dimension) {
-            // if pivot is greater than current point in that dimension, current point should be added to the lesser group
-            Ordering::Greater => lesser.push(point),
-            // if pivot is less than or equal to current point in dimension, add current point to greater group
-            Ordering::Equal | Ordering::Less => greater.push(point),
+        match point.compare_dimension(&pivot, curr_dimension) {
+            Ordering::Equal | Ordering::Greater => right_sub_tree.push(point),
+            Ordering::Less => left_sub_tree.push(point),
         }
     }
-    (pivot, lesser, greater)
+    (pivot, left_sub_tree, right_sub_tree)
 }
 
 fn get_pivot(points: &mut Vec<Point>, curr_dimension: &Dimension) -> Point {
