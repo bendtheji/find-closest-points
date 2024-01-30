@@ -91,7 +91,7 @@ fn calculate_mean(points: &Vec<Point>, curr_dimension: &Dimension) -> f64 {
 mod kd_tree_test {
     use crate::point::{Dimension, Point};
 
-    use super::{calculate_mean, get_pivot};
+    use super::{calculate_mean, get_pivot, partition};
 
     #[test]
     fn get_x_mean_from_points() {
@@ -181,6 +181,87 @@ mod kd_tree_test {
         ];
         let output = get_pivot(&mut points, &Dimension::X);
         let expected = Point::new(0.1, 0.2, 0.3);
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn partition_by_x() {
+        let points = vec![
+            Point::new(0.1, 0.2, 0.3),
+            Point::new(0.2, 0.3, 0.5),
+            Point::new(0.3, 0.5, 0.6),
+            Point::new(0.4, 0.1, 0.3),
+        ];
+        let output = partition(points, &Dimension::X);
+        let expected = (
+            Point::new(0.2, 0.3, 0.5),
+            vec![Point::new(0.1, 0.2, 0.3)],
+            vec![Point::new(0.4, 0.1, 0.3), Point::new(0.3, 0.5, 0.6)]
+        );
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn partition_by_y() {
+        let points = vec![
+            Point::new(0.1, 0.2, 0.3),
+            Point::new(0.2, 0.3, 0.5),
+            Point::new(0.3, 0.5, 0.6),
+            Point::new(0.4, 0.1, 0.3),
+        ];
+        let output = partition(points, &Dimension::Y);
+        let expected = (
+            Point::new(0.2, 0.3, 0.5),
+            vec![Point::new(0.1, 0.2, 0.3), Point::new(0.4, 0.1, 0.3)],
+            vec![Point::new(0.3, 0.5, 0.6)]
+        );
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn partition_by_z() {
+        let points = vec![
+            Point::new(0.1, 0.2, 0.3),
+            Point::new(0.2, 0.3, 0.5),
+            Point::new(0.3, 0.5, 0.6),
+            Point::new(0.4, 0.1, 0.3),
+        ];
+        let output = partition(points, &Dimension::Z);
+        let expected = (
+            Point::new(0.2, 0.3, 0.5),
+            vec![Point::new(0.1, 0.2, 0.3), Point::new(0.4, 0.1, 0.3)],
+            vec![Point::new(0.3, 0.5, 0.6)]
+        );
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn partition_len_2_vec_empty_right() {
+        let points = vec![
+            Point::new(0.2, 0.3, 0.4),
+            Point::new(0.4, 0.7, 0.9),
+        ];
+        let output = partition(points, &Dimension::Y);
+        let expected = (
+            Point::new(0.4, 0.7, 0.9),
+            vec![Point::new(0.2, 0.3, 0.4)],
+            vec![]
+        );
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn partition_len_2_vec_empty_left() {
+        let points = vec![
+            Point::new(0.2, 0.3, 0.4),
+            Point::new(0.4, 0.7, 0.9),
+        ];
+        let output = partition(points, &Dimension::Z);
+        let expected = (
+            Point::new(0.2, 0.3, 0.4),
+            vec![],
+            vec![Point::new(0.4, 0.7, 0.9)]
+        );
         assert_eq!(output, expected);
     }
 }
