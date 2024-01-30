@@ -1,4 +1,4 @@
-use std::cmp;
+use std::cmp::Ordering;
 
 use rand::{Rng, thread_rng};
 
@@ -40,6 +40,15 @@ impl Point {
             0 => self.x,
             1 => self.y,
             2 => self.z,
+            _ => unreachable!()
+        }
+    }
+
+    pub fn compare_dimension(&self, other: &Point, dimension: u8) -> Ordering {
+        match dimension {
+            0 => self.x.total_cmp(&other.x),
+            1 => self.y.total_cmp(&other.y),
+            2 => self.z.total_cmp(&other.z),
             _ => unreachable!()
         }
     }

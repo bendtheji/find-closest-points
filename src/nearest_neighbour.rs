@@ -36,7 +36,7 @@ pub fn find_k_nearest_neighbours(curr_node: &Option<Box<KdTreeNode>>, given_poin
         let curr_point = &curr_node.point;
 
         let curr_dimension = curr_dimension % max_dimension;
-        match crate::kd_tree::compare_dimension(&curr_point, given_point, curr_dimension) {
+        match curr_point.compare_dimension(&given_point, curr_dimension) {
             // if current node current dimension is greater than given node, go into left subtree
             Ordering::Greater => {
                 find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, curr_dimension + 1, max_dimension, k_nearest_neighbours);

@@ -1,5 +1,4 @@
 use std::cmp::Ordering;
-use std::collections::BinaryHeap;
 
 use crate::point::Point;
 
@@ -82,7 +81,7 @@ fn partition(mut points: Vec<Point>, curr_dimension: u8) -> (Point, Vec<Point>, 
     let mut greater = vec![];
 
     for point in points {
-        match compare_dimension(&pivot, &point, curr_dimension) {
+        match pivot.compare_dimension(&point, curr_dimension) {
             // if pivot is greater than current point in that dimension, current point should be added to the lesser group
             Ordering::Greater => lesser.push(point),
             // if pivot is less than or equal to current point in dimension, add current point to greater group

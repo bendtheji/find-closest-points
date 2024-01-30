@@ -6,10 +6,10 @@ use find_closest_points::nearest_neighbour::{Distance, find_k_nearest_neighbours
 
 fn main() {
     let mut points = vec![];
-    for i in 0..10000000 {
+    for _ in 0..10000000 {
         points.push(Point::random());
     }
-    let mut clone_points: Vec<Point> = points.clone();
+    let clone_points: Vec<Point> = points.clone();
     println!("constructing tree...");
     let tree = KdTreeNode::construct_tree(points);
     println!("construction finished");
