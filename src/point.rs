@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use rand::{Rng, thread_rng};
 
+/// Struct which contains dimensions in a 3D space.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Point {
     pub x: f64,
@@ -10,6 +11,7 @@ pub struct Point {
 }
 
 impl Point {
+    /// Create a new point where each dimension is within [0.0, 0.1].
     pub fn new(x: f64, y: f64, z: f64) -> Point {
         Point {
             x: clamp(x),
@@ -18,17 +20,20 @@ impl Point {
         }
     }
 
+    /// Creates a new point using random values.
     pub fn random() -> Point {
         let mut rng = thread_rng();
         Point::new(rng.gen(), rng.gen(), rng.gen())
     }
 
+    /// Calculate the Euclidean distance of a given point to another point.
     pub fn distance_to(&self, other: &Point) -> f64 {
         ((self.x - other.x).powf(2.0)
             + (self.y - other.y).powf(2.0)
             + (self.z - other.z).powf(2.0)).sqrt()
     }
 
+    /// Return the value of the dimension for a point.
     pub fn get_dimension(&self, dimension: &Dimension) -> f64 {
         match dimension {
             Dimension::X => self.x,
@@ -37,6 +42,7 @@ impl Point {
         }
     }
 
+    /// Returns an `Ordering` comparing a particular dimension from both points.
     pub fn compare_dimension(&self, other: &Point, dimension: &Dimension) -> Ordering {
         self.get_dimension(dimension).total_cmp(&other.get_dimension(dimension))
     }
@@ -158,7 +164,7 @@ mod point_test {
     }
 }
 
-
+/// Struct for keeping track of the current dimension in building the kd-tree
 #[derive(Debug, PartialEq)]
 pub enum Dimension {
     X,
@@ -167,6 +173,7 @@ pub enum Dimension {
 }
 
 impl Dimension {
+    /// Rotates the current dimension to the next one.
     pub fn turn(&self) -> Self {
         use Dimension::*;
         match self {

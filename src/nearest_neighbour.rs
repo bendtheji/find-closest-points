@@ -4,6 +4,8 @@ use std::collections::BinaryHeap;
 use crate::kd_tree::KdTreeNode;
 use crate::point::{Dimension, Point};
 
+/// Struct that keeps track of a current node in the tree
+/// and the distance of the node from the target point.
 #[derive(Debug)]
 pub struct Neighbour {
     pub distance: f64,
@@ -30,6 +32,7 @@ impl Ord for Neighbour {
     }
 }
 
+/// Function to find k nearest neighbours within kd-tree.
 pub fn find_k_nearest_neighbours(curr_node: &Option<Box<KdTreeNode>>, given_point: &Point, curr_dimension: &Dimension,
                                  k_nearest_neighbours: &mut BinaryHeap<Neighbour>, k :usize) {
     if let Some(x) = curr_node {

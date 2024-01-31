@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use crate::point::{Dimension, Point};
 
+/// Struct that represents a node in the kd-tree data structure.
 #[derive(Debug, Clone, PartialEq)]
 pub struct KdTreeNode {
     pub point: Point,
@@ -18,6 +19,7 @@ impl KdTreeNode {
         }
     }
 
+    /// Constructs a kd-tree from a vector of `Point` objects.
     pub fn construct_tree(points: Vec<Point>) -> KdTreeNode {
         match construct_kd_tree(points, &Dimension::X) {
             Some(x) => *x,
@@ -67,6 +69,8 @@ fn partition(mut points: Vec<Point>, curr_dimension: &Dimension) -> (Point, Vec<
     (pivot, left_sub_tree, right_sub_tree)
 }
 
+/// We calculate the mean then find the pivot point that has the closest value
+/// in the current dimension.
 fn get_pivot(points: &mut Vec<Point>, curr_dimension: &Dimension) -> Point {
     let mean = calculate_mean(&points, curr_dimension);
     let mut min_diff = f64::MAX;

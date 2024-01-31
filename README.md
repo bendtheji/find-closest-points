@@ -16,6 +16,8 @@ Putting the same 100000 points into another `Vec!`, computing the distance betwe
 
 ## Time and Space Complexity
 
+### Time Complexity
+
 #### Constructing kd-tree
 Constructing the kd-tree involves finding the mean value over a dimension from the list of points, and then finding a pivot point which is closest to the mean value in that dimension.
 
@@ -31,6 +33,9 @@ Then as we go up the kd-tree to the root node, we want to check whether the dist
 Traversing through the potential subtrees that contain our potential nearest neighbours will take an overall time complexity of O(logN) time complexity. The time complexity taken to add each candidate to our max heap is O(logk), where k is 10 in our scenario. 
 
 Overall, time complexity for finding k nearest neighbours in our kd-tree is O(logN).
+
+### Space Complexity
+Our kd-tree uses O(N) space complexity, and the max heap we use to keep track of our k nearest neighbours is O(k), but in our case is 10 so this is negligible. Therefore, our overall space complexity here is O(N).
 
 
 ## Benchmarks
