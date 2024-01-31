@@ -1,13 +1,13 @@
 use std::collections::BinaryHeap;
 
 use find_closest_points::kd_tree::KdTreeNode;
+use find_closest_points::nearest_neighbour::{find_k_nearest_neighbours, Neighbour};
 use find_closest_points::point::{Dimension, Point};
-use find_closest_points::nearest_neighbour::{Distance, find_k_nearest_neighbours};
 
 fn main() {
     println!("generating random points");
     let mut points = vec![];
-    for _ in 0..10_000_000 {
+    for _ in 0..100_000 {
         points.push(Point::random());
     }
 
@@ -19,19 +19,19 @@ fn main() {
     let mut heap = BinaryHeap::new();
     println!("finding nearest neighbours");
     find_k_nearest_neighbours(&Some(Box::new(tree)), &given_point, &Dimension::X, &mut heap);
-    let mut heap_vec = heap.into_iter().collect::<Vec<Distance>>();
+    let mut heap_vec = heap.into_iter().collect::<Vec<Neighbour>>();
     heap_vec.sort();
     println!("given point: {:?}", given_point);
-    for distance in &heap_vec {
-        println!("Distance, value: {:?}, point: {:?}", distance.value, distance.other_point);
+    for neighbour in &heap_vec {
+        println!("Nearest Neighbour, value: {:?}, point: {:?}", neighbour.distance, neighbour.point);
     }
 
-    let mut distances = points.into_iter().map(|p| Distance { value: given_point.distance_to(&p), other_point: p }).collect::<Vec<Distance>>();
-    distances.sort();
+    let mut neighbours = points.into_iter().map(|p| Neighbour { distance: given_point.distance_to(&p), point: p }).collect::<Vec<Neighbour>>();
+    neighbours.sort();
     println!("using sort: ");
     for i in 0..10 {
-        println!("Distance, value: {:?}, point: {:?}", distances[i].value, distances[i].other_point);
+        println!("Nearest Neighbour, value: {:?}, point: {:?}", neighbours[i].distance, neighbours[i].point);
     }
 
-    assert_eq!(heap_vec, &distances[0..10]);
+    assert_eq!(heap_vec, &neighbours[0..10]);
 }

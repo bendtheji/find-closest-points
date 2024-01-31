@@ -3,14 +3,14 @@ use std::collections::BinaryHeap;
 use criterion::{BatchSize, Bencher, black_box, Criterion, criterion_group, criterion_main};
 
 use find_closest_points::kd_tree::KdTreeNode;
-use find_closest_points::nearest_neighbour::{Distance, find_k_nearest_neighbours};
+use find_closest_points::nearest_neighbour::{Neighbour, find_k_nearest_neighbours};
 use find_closest_points::point::{Dimension, Point};
 
 fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
     let points = black_box(generate_10m_random_points());
     let tree = black_box(Some(Box::new(KdTreeNode::construct_tree(points))));
     let given_point = black_box(Point::random());
-    b.iter_batched(|| BinaryHeap::<Distance>::new(),
+    b.iter_batched(|| BinaryHeap::<Neighbour>::new(),
                    |mut heap| find_k_nearest_neighbours(&tree,
                                                         &given_point,
                                                         &Dimension::X, &mut heap),

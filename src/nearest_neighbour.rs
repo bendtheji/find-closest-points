@@ -5,65 +5,46 @@ use crate::kd_tree::KdTreeNode;
 use crate::point::{Dimension, Point};
 
 #[derive(Debug)]
-pub struct Distance {
-    pub value: f64,
-    pub other_point: Point,
+pub struct Neighbour {
+    pub distance: f64,
+    pub point: Point,
 }
 
-impl Eq for Distance {}
+impl Eq for Neighbour {}
 
-impl PartialEq<Self> for Distance {
+impl PartialEq<Self> for Neighbour {
     fn eq(&self, other: &Self) -> bool {
-        self.value.eq(&other.value)
+        self.distance.eq(&other.distance)
     }
 }
 
-impl PartialOrd<Self> for Distance {
+impl PartialOrd<Self> for Neighbour {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.value.partial_cmp(&other.value)
+        self.distance.partial_cmp(&other.distance)
     }
 }
 
-impl Ord for Distance {
+impl Ord for Neighbour {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.value.total_cmp(&other.value)
+        self.distance.total_cmp(&other.distance)
     }
 }
 
 pub fn find_k_nearest_neighbours(curr_node: &Option<Box<KdTreeNode>>, given_point: &Point, curr_dimension: &Dimension,
-                                 k_nearest_neighbours: &mut BinaryHeap<Distance>) {
+                                 k_nearest_neighbours: &mut BinaryHeap<Neighbour>) {
     if let Some(x) = curr_node {
         let curr_node = x;
         let curr_point = &curr_node.point;
+        let right_subtree = &curr_node.as_ref().right;
+        let left_subtree = &curr_node.as_ref().left;
 
         match given_point.compare_dimension(&curr_point, curr_dimension) {
             Ordering::Equal | Ordering::Greater => {
-                find_k_nearest_neighbours(&curr_node.as_ref().right, given_point, &curr_dimension.turn(), k_nearest_neighbours);
-                // check if we should be going into the other bounding box
-                let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs();
-                if k_nearest_neighbours.len() < 10 {
-                    find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, &curr_dimension.turn(), k_nearest_neighbours);
-                } else {
-                    if let Some(d) = k_nearest_neighbours.peek() {
-                        if distance_to_other_bounding_box < d.value {
-                            find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, &curr_dimension.turn(), k_nearest_neighbours);
-                        }
-                    }
-                }
+                traverse(curr_point, given_point, curr_dimension, right_subtree,
+                         left_subtree, k_nearest_neighbours);
             }
             Ordering::Less => {
-                find_k_nearest_neighbours(&curr_node.as_ref().left, given_point, &curr_dimension.turn(), k_nearest_neighbours);
-                // check if we should be going into the other bounding box
-                let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs();
-                if k_nearest_neighbours.len() < 10 {
-                    find_k_nearest_neighbours(&curr_node.as_ref().right, given_point, &curr_dimension.turn(), k_nearest_neighbours);
-                } else {
-                    if let Some(d) = k_nearest_neighbours.peek() {
-                        if distance_to_other_bounding_box < d.value {
-                            find_k_nearest_neighbours(&curr_node.as_ref().right, given_point, &curr_dimension.turn(), k_nearest_neighbours);
-                        }
-                    }
-                }
+                traverse(curr_point, given_point, curr_dimension, left_subtree, right_subtree, k_nearest_neighbours);
             }
         }
 
@@ -72,16 +53,34 @@ pub fn find_k_nearest_neighbours(curr_node: &Option<Box<KdTreeNode>>, given_poin
         // two cases, one is binary heap has 10 points already
         // 1) there are less than ten points inside, so we just push
         if k_nearest_neighbours.len() < 10 {
-            k_nearest_neighbours.push(Distance { value: curr_distance, other_point: curr_point.clone() });
+            k_nearest_neighbours.push(Neighbour { distance: curr_distance, point: curr_point.clone() });
         }
         // 2) we need to check against the top, if curr node distance is shorter
         // we pop the top and push this new one in
         else {
-            if let Some(d) = k_nearest_neighbours.peek() {
-                if curr_distance < d.value {
+            if let Some(n) = k_nearest_neighbours.peek() {
+                if curr_distance < n.distance {
                     k_nearest_neighbours.pop();
-                    k_nearest_neighbours.push(Distance { value: curr_distance, other_point: curr_point.clone() });
+                    k_nearest_neighbours.push(Neighbour { distance: curr_distance, point: curr_point.clone() });
                 }
+            }
+        }
+    }
+}
+
+fn traverse(curr_point: &Point, given_point: &Point, curr_dimension: &Dimension,
+            main_subtree: &Option<Box<KdTreeNode>>, other_subtree: &Option<Box<KdTreeNode>>,
+            k_nearest_neighbours: &mut BinaryHeap<Neighbour>,
+) {
+    find_k_nearest_neighbours(main_subtree, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+    // check if we should be going into the other bounding box
+    let distance_to_other_bounding_box = (curr_point.get_dimension(curr_dimension) - given_point.get_dimension(curr_dimension)).abs();
+    if k_nearest_neighbours.len() < 10 {
+        find_k_nearest_neighbours(other_subtree, given_point, &curr_dimension.turn(), k_nearest_neighbours);
+    } else {
+        if let Some(n) = k_nearest_neighbours.peek() {
+            if distance_to_other_bounding_box < n.distance {
+                find_k_nearest_neighbours(other_subtree, given_point, &curr_dimension.turn(), k_nearest_neighbours);
             }
         }
     }
