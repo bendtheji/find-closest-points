@@ -18,7 +18,7 @@ fn main() {
     let given_point = Point::random();
     let mut heap = BinaryHeap::new();
     println!("finding nearest neighbours");
-    find_k_nearest_neighbours(&Some(Box::new(tree)), &given_point, &Dimension::X, &mut heap);
+    find_k_nearest_neighbours(&Some(Box::new(tree)), &given_point, &Dimension::X, &mut heap, 10);
     let mut heap_vec = heap.into_iter().collect::<Vec<Neighbour>>();
     heap_vec.sort();
     println!("given point: {:?}", given_point);

@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::point::{Dimension, Point};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct KdTreeNode {
     pub point: Point,
     pub left: Option<Box<KdTreeNode>>,
@@ -91,7 +91,7 @@ fn calculate_mean(points: &Vec<Point>, curr_dimension: &Dimension) -> f64 {
 mod kd_tree_test {
     use crate::point::{Dimension, Point};
 
-    use super::{calculate_mean, get_pivot, partition};
+    use super::{calculate_mean, construct_kd_tree, get_pivot, KdTreeNode, partition};
 
     #[test]
     fn get_x_mean_from_points() {
@@ -264,4 +264,42 @@ mod kd_tree_test {
         );
         assert_eq!(output, expected);
     }
+
+    #[test]
+    fn build_kd_tree_empty_vec() {
+        let points = vec![];
+        let output = construct_kd_tree(points, &Dimension::X);
+        let expected = None;
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn build_kd_tree_one_point() {
+        let points = vec![Point::new(0.1, 0.1, 0.1)];
+        let output = construct_kd_tree(points, &Dimension::X);
+        let expected = Some(Box::new(KdTreeNode::new(Point::new(0.1, 0.1, 0.1))));
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn build_kd_tree() {
+        let points = vec![
+            Point::new(0.1, 0.1, 0.1),
+            Point::new(0.2, 0.2, 0.2),
+            Point::new(0.3, 0.3, 0.3),
+        ];
+        // simple kd tree
+        let left_subtree = Some(Box::new(KdTreeNode::new(Point::new(0.1, 0.1, 0.1))));
+        let right_subtree = Some(Box::new(KdTreeNode::new(Point::new(0.3, 0.3, 0.3))));
+        let mut root = KdTreeNode::new(Point::new(0.2, 0.2, 0.2));
+        root.left = left_subtree;
+        root.right = right_subtree;
+        let root = Some(Box::new(root));
+
+        let output = construct_kd_tree(points, &Dimension::X);
+        let expected = root;
+
+        assert_eq!(output, expected);
+    }
 }
+
