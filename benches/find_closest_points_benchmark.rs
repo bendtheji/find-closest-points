@@ -12,9 +12,9 @@ fn bench_find_closest_neighbours_kd_tree(b: &mut Bencher) {
     let tree = black_box(Some(Box::new(KdTreeNode::construct_tree(points))));
     let given_point = black_box(Point::random());
     b.iter_batched(|| BinaryHeap::<Neighbour>::new(),
-                   |mut heap| find_k_nearest_neighbours(&tree,
+                   |mut heap| black_box(find_k_nearest_neighbours(&tree,
                                                         &given_point,
-                                                        &Dimension::X, &mut heap, NUM_OF_NEAREST_NEIGHBOURS),
+                                                        &Dimension::X, &mut heap, NUM_OF_NEAREST_NEIGHBOURS)),
                    BatchSize::SmallInput);
 }
 
